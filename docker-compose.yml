@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file: db.env
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+  bot-vk:
+    restart: always
+    build:
+      context: https://github.com/UlSTU-Schedule/bot-vk.git
+    env_file: vk.env
+    depends_on:
+      - db
+  bot-telegram:
+    restart: always
+    build:
+      context: https://github.com/UlSTU-Schedule/bot-telegram.git
+    env_file: tg.env
+    depends_on:
+      - bot-vk
+  reserver:
+    restart: always
+    build:
+      context: https://github.com/UlSTU-Schedule/reserver.git
+    env_file: reserver.env
+    depends_on:
+      - bot-telegram
+
+volumes:
+  postgres_volume:
